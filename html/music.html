@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    var route = "/music/"
+       $(document).ready(init);
+        function init() {
+            var l = $('<a></a><br>').text("点击查看音乐").appendTo($(".list"))
+                .addClass("file")
+                .click(play);
+        };
+        function play(){
+            $(".name").empty()
+            $.get(route,function(data,status){
+                lists = data.split(",")
+                $.each(lists,function(index,name){
+                   if (name.length == 0) return;
+                    $('<a></a><br>').text(name)
+                        .appendTo($(".name"))
+                        .click(function(){
+                            $("#music").attr("src",route+"/"+name);
+                            // $.get(route)
+                            $("#music").play();
+                        });
+                    })
+            })
+        };
+        </script>
+    </head>
+        <body>
+            <audio id="music" controls autoplay autobuffer>
+                当前浏览器无法播放
+            </audio><br>
+            <dev class="list">
+            </dev>
+            <dev class="name"></dev>
+        </body>
+</html>
