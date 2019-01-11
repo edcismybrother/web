@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            window.onload = function(){
+                init();
+            };
+            function init() {
+                $("#d1").fadeIn(1000);
+                $("#d2").fadeIn(2000);
+                $("#d3").fadeIn(3000);
+            };
+            var times = 0
+            window.onclick = function(){
+                // alert("hello")
+                // $("#mi").load("music.html");
+                if (times == 0){
+                    times = 1
+                    // document.getElementById("mi").innerHTML = '<object type="text/html" data="music.html" width="100%" height="100%"></object>';
+                    window.location.href = "/music"
+                };
+            };
+        </script>
+    </head>
+    <body>
+        <dev id="d1" style="width:80px;height:80px;display:none;background-color:red;">
+            <a>go</a>
+        </dev><br>
+        <dev id="d2" style="width:80px;height:80px;display:none;background-color:green;">
+            <a>gogo</a>
+        </dev><br>
+        <dev id="d3" style="width:80px;height:80px;display:none;background-color:blue;">
+            <a>gogogo</a>
+        </dev><br>
+        <dev id="mi"></dev><br>
+    </body>
+</html>

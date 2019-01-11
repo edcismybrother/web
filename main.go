@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -16,11 +15,19 @@ var MusicPath = "music"
 
 func main() {
 	http.HandleFunc("/", index)
-	http.HandleFunc("/music/", music)
+	http.HandleFunc("/music/", musicIndex)
+	http.HandleFunc("/music/src", musicSource)
 	http.ListenAndServe(":8080", nil)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("html/index.html")
+	if err != nil {
+		log.Println(err)
+	}
+	t.Execute(w, nil)
+}
+func musicIndex(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("html/music.html")
 	if err != nil {
 		log.Println(err)
@@ -28,9 +35,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
-func music(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("lenmon走音乐")
-	p := MusicPath + r.URL.Path[len("/music"):]
+func musicSource(w http.ResponseWriter, r *http.Request) {
+	p := MusicPath + r.URL.Path[len("/music/src"):]
 	file, _ := os.Stat(p)
 	if file.IsDir() {
 		f, _ := os.Open(p)
