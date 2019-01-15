@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	"pylearn/web/logic"
+	"sync"
 )
 
 type st struct {
@@ -14,10 +18,34 @@ type st struct {
 var MusicPath = "music"
 
 func main() {
-	http.HandleFunc("/", index)
-	http.HandleFunc("/music/", musicIndex)
-	http.HandleFunc("/music/src", musicSource)
-	http.ListenAndServe(":8080", nil)
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		http.HandleFunc("/", index)
+		http.HandleFunc("/music/", musicIndex)
+		http.HandleFunc("/music/src/", musicSource)
+		http.ListenAndServe(":8080", nil)
+	}()
+	go func() {
+		// 游戏服
+		defer wg.Done()
+		lis, err := net.Listen("tcp", "127.0.0.1:8123")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println("游戏服开启")
+		for {
+			conn, err := lis.Accept()
+			if err != nil {
+				break
+			}
+			fmt.Println("游戏连接成功")
+			go logic.NewPlayer(conn)
+		}
+	}()
+	wg.Wait()
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
