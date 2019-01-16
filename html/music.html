@@ -5,11 +5,11 @@
     <script type="text/javascript">
     var route = "/music/src"
        $(document).ready(init);
-        function init() {
+       function init() {
             var l = $('<a></a><br>').text("点击查看音乐").appendTo($(".list"))
                 .addClass("file")
                 .click(play);
-        };
+       };
         function play(){
             $(".name").empty()
             $.get(route,function(data,status){
@@ -27,20 +27,20 @@
             })
         };
         $(function(){
-            var socket
-            var host = "ws://127.0.0.1:8123";
             $("#begin").click(function(){
-                socket=new WebSocket(host);
+                var host = "ws://127.0.0.1:8080/ws";
+                var socket=new WebSocket(host);
+                $("#begin").hide();
                 socket.onmessage = function(event){
-                    alert(event.data) 
+                    var msg = event.data
+                    alert(msg);
                 };
-                socket.send("hello");
-            });
-            $("#login").click(function(){
-                var user = $("#user").val();
-                var pass = $("#pass").val();
-                socket.send("hello");
-            });
+                $("#login").click(function(){
+                    var user = $("#user").val();
+                    var pass = $("#pass").val();
+                    socket.send(user+"@"+pass);
+                })
+            })
         })
         </script>
     </head>
@@ -52,11 +52,11 @@
             </dev>
             <dev class="name"></dev>
             <dev id="game">
-                <button id="begin">开始游戏</button>
+                <button id="begin" type="submit">开始游戏</button>
             <dev>
                 <input type="text" id="user">
                 <input type="text" id="pass">
-                <input type="button" id="login">
+                <input id="login" type="submit">
             </dev>
             </dev>
         </body>

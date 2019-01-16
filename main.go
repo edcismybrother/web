@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"net"
 	"net/http"
 	"os"
-	"pylearn/web/logic"
-	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type st struct {
@@ -18,34 +17,33 @@ type st struct {
 var MusicPath = "music"
 
 func main() {
-	wg := new(sync.WaitGroup)
-	wg.Add(2)
-	go func() {
-		defer wg.Done()
-		http.HandleFunc("/", index)
-		http.HandleFunc("/music/", musicIndex)
-		http.HandleFunc("/music/src/", musicSource)
-		http.ListenAndServe(":8080", nil)
-	}()
-	go func() {
-		// 游戏服
-		defer wg.Done()
-		lis, err := net.Listen("tcp", "127.0.0.1:8123")
+	http.HandleFunc("/", index)
+	http.HandleFunc("/music/", musicIndex)
+	http.HandleFunc("/music/src/", musicSource)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println("游戏服开启")
-		for {
-			conn, err := lis.Accept()
-			if err != nil {
-				break
+		go func() {
+			for {
+				_, data, err := conn.ReadMessage()
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				fmt.Println(string(data))
+				err = conn.WriteMessage(1, []byte("hello,client"))
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
-			fmt.Println("游戏连接成功")
-			go logic.NewPlayer(conn)
-		}
-	}()
-	wg.Wait()
+		}()
+	})
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
